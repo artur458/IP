@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Lookup</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 450px;
+            width: 100%;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+        }
+        input {
+            width: 80%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .search-btn {
+            background: #ff4b5c;
+            color: white;
+        }
+        .search-btn:hover {
+            background: #e63946;
+        }
+        .copy-btn {
+            background: #4caf50;
+            color: white;
+            display: none;
+        }
+        .copy-btn:hover {
+            background: #43a047;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: left;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>IP Информация</h1>
+        <input type="text" id="ipInput" placeholder="Введите IP-адрес">
+        <button class="search-btn" onclick="lookupIP()">🔍 Найти</button>
+        <div id="result"></div>
+        <button class="copy-btn" onclick="copyToClipboard()">📋 Копировать</button>
+    </div>
+    
+    <script>
+        function lookupIP() {
+            let ip = document.getElementById("ipInput").value.trim();
+            if (!ip) {
+                alert("Введите IP-адрес!");
+                return;
+            }
+            fetch(`http://ip-api.com/json/${ip}?lang=ru`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "fail") {
+                        document.getElementById("result").innerHTML = "❌ Ошибка: " + data.message;
+                        document.querySelector(".copy-btn").style.display = "none";
+                    } else {
+                        let resultHTML = `
+                            <strong>📌 IP-адрес:</strong> ${data.query} <br>
+                            <strong>🌍 Страна:</strong> ${data.country} <br>
+                            <strong>📍 Регион:</strong> ${data.regionName} <br>
+                            <strong>🏙 Город:</strong> ${data.city} <br>
+                            <strong>📮 Почтовый индекс:</strong> ${data.zip} <br>
+                            <strong>🌎 Широта:</strong> ${data.lat} <br>
+                            <strong>🌏 Долгота:</strong> ${data.lon} <br>
+                            <strong>🔌 Оператор:</strong> ${data.isp} <br>
+                            <strong>🏢 Организация:</strong> ${data.org} <br>
+                        `;
+                        document.getElementById("result").innerHTML = resultHTML;
+                        document.querySelector(".copy-btn").style.display = "inline-block";
+                    }
+                })
+                .catch(() => {
+                    document.getElementById("result").innerHTML = "❌ Ошибка запроса";
+                    document.querySelector(".copy-btn").style.display = "none";
+                });
+        }
+        
+        function copyToClipboard() {
+            let text = document.getElementById("result").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("✅ Скопировано в буфер обмена!");
+            }).catch(err => {
+                alert("❌ Ошибка копирования: " + err);
+            });
+        }
+    </script>
+</body>
+</html>
