@@ -16,7 +16,7 @@ IP Lookup Site - это современное веб-приложение, ко
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/твой-юзер/ip-lookup-site.git
+   git clone https://github.com/artur458/ip-lookup-site.git
    cd ip-lookup-site
    ```
 2. Откройте `index.html` в браузере.
