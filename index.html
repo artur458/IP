@@ -65,14 +65,32 @@
             word-wrap: break-word;
             font-size: 14px;
         }
+        #map-link {
+            display: none;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #ffcc00;
+            text-decoration: none;
+        }
+        .github-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+        }
     </style>
 </head>
 <body>
+    <a href="https://github.com/your-repository" target="_blank">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="github-icon" alt="GitHub">
+    </a>
     <div class="container">
         <h1>IP Информация</h1>
         <input type="text" id="ipInput" placeholder="Введите IP-адрес">
         <button class="search-btn" onclick="lookupIP()">🔍 Найти</button>
         <div id="result"></div>
+        <a id="map-link" target="_blank">📍 Открыть в Google Maps</a>
         <button class="copy-btn" onclick="copyToClipboard()">📋 Копировать</button>
     </div>
     
@@ -83,31 +101,35 @@
                 alert("Введите IP-адрес!");
                 return;
             }
-            fetch(`http://ip-api.com/json/${ip}?lang=ru`)
+            fetch(`https://ipwho.is/${ip}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.status === "fail") {
+                    if (!data.success) {
                         document.getElementById("result").innerHTML = "❌ Ошибка: " + data.message;
                         document.querySelector(".copy-btn").style.display = "none";
+                        document.getElementById("map-link").style.display = "none";
                     } else {
                         let resultHTML = `
-                            <strong>📌 IP-адрес:</strong> ${data.query} <br>
+                            <strong>📌 IP-адрес:</strong> ${data.ip} <br>
                             <strong>🌍 Страна:</strong> ${data.country} <br>
-                            <strong>📍 Регион:</strong> ${data.regionName} <br>
+                            <strong>📍 Регион:</strong> ${data.region} <br>
                             <strong>🏙 Город:</strong> ${data.city} <br>
-                            <strong>📮 Почтовый индекс:</strong> ${data.zip} <br>
-                            <strong>🌎 Широта:</strong> ${data.lat} <br>
-                            <strong>🌏 Долгота:</strong> ${data.lon} <br>
-                            <strong>🔌 Оператор:</strong> ${data.isp} <br>
-                            <strong>🏢 Организация:</strong> ${data.org} <br>
+                            <strong>🌎 Широта:</strong> ${data.latitude} <br>
+                            <strong>🌏 Долгота:</strong> ${data.longitude} <br>
+                            <strong>🔌 Оператор:</strong> ${data.connection.isp} <br>
                         `;
                         document.getElementById("result").innerHTML = resultHTML;
                         document.querySelector(".copy-btn").style.display = "inline-block";
+                        
+                        let mapLink = document.getElementById("map-link");
+                        mapLink.href = `https://www.google.com/maps?q=${data.latitude},${data.longitude}`;
+                        mapLink.style.display = "block";
                     }
                 })
                 .catch(() => {
                     document.getElementById("result").innerHTML = "❌ Ошибка запроса";
                     document.querySelector(".copy-btn").style.display = "none";
+                    document.getElementById("map-link").style.display = "none";
                 });
         }
         
